@@ -18,4 +18,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    allowedHosts: [
+      'devserver-main--melodic-quokka-ddaeb2.netlify.app'
+    ]
+  }
 });
