@@ -20,7 +20,7 @@ export default defineConfig({
   },
   server: {
     allowedHosts: [
-      'devserver-main--melodic-quokka-ddaeb2.netlify.app'
+      'artenomaterials.com'
     ]
   }
 });
