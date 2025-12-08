@@ -1470,29 +1470,39 @@ export default function InspirationsPage({
       {/* Full Navigation - Same as Home Page */}
       <nav className="fixed top-0 w-full backdrop-blur-sm border-b z-40" style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* Left Navigation */}
+          <div className="flex justify-between items-center h-20 md:justify-between">
+            {/* Mobile menu button - Left side on mobile */}
+            <div className="md:hidden order-1">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-gray-300 hover:text-white"
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+
+            {/* Left Navigation - Desktop only */}
             <div className="hidden md:flex items-center space-x-8 flex-1">
               <a href="#products" onClick={handleProductsClick} className="text-gray-300 hover:text-white transition-colors">Products</a>
               <a href="#applications" onClick={handleInspirationsClick} className="text-gray-300 hover:text-white transition-colors">Inspirations</a>
               <a href="#about" onClick={onAboutClick} className="text-gray-300 hover:text-white transition-colors">About</a>
             </div>
-            
-            {/* Center Logo - Clickable */}
-            <div className="flex items-center">
+
+            {/* Center Logo - Centered on mobile AND desktop */}
+            <div className="flex items-center order-2 absolute left-1/2 transform -translate-x-1/2">
               <button
                 onClick={onLogoClick}
                 className="hover:opacity-80 transition-opacity"
               >
-                <img 
-                  src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png" 
+                <img
+                  src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
                   alt="ARTENO"
                   className="h-16 w-auto"
                 />
               </button>
             </div>
 
-            {/* Right Navigation */}
+            {/* Right Navigation - Desktop only */}
             <div className="hidden md:flex items-center space-x-6 flex-1 justify-end">
               <button
                 onClick={onSignOut}
@@ -1500,7 +1510,7 @@ export default function InspirationsPage({
               >
                 Sign Out
               </button>
-              <button 
+              <button
                 onClick={handleSearchToggle}
                 className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
               >
@@ -1509,15 +1519,8 @@ export default function InspirationsPage({
               </button>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-300 hover:text-white"
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
+            {/* Spacer for mobile to balance the layout */}
+            <div className="md:hidden order-3 w-6"></div>
           </div>
         </div>
 

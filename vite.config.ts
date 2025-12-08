@@ -18,9 +18,4 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
-  server: {
-    allowedHosts: [
-      'artenomaterials.com'
-    ]
-  }
 });

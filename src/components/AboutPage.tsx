@@ -1192,29 +1192,39 @@ const AboutPage: React.FC<AboutPageProps> = ({
       {/* Full Navigation - Same as other pages */}
       <nav className="fixed top-0 w-full backdrop-blur-sm border-b z-40" style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', borderColor: '#333' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* Left Navigation */}
+          <div className="flex justify-between items-center h-20 md:justify-between">
+            {/* Mobile menu button - Left side on mobile */}
+            <div className="md:hidden order-1">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-gray-300 hover:text-white"
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+
+            {/* Left Navigation - Desktop only */}
             <div className="hidden md:flex items-center space-x-8 flex-1">
               <a href="#products" onClick={handleProductsClick} className="text-gray-300 hover:text-white transition-colors">Products</a>
               <a href="#applications" onClick={onInspirationsClick} className="text-gray-300 hover:text-white transition-colors">Inspirations</a>
               <a href="#about" onClick={handleAboutClick} className="text-gray-300 hover:text-white transition-colors">About</a>
             </div>
-            
-            {/* Center Logo - Clickable */}
-            <div className="flex items-center">
+
+            {/* Center Logo - Centered on mobile AND desktop */}
+            <div className="flex items-center order-2 absolute left-1/2 transform -translate-x-1/2">
               <button
                 onClick={onLogoClick}
                 className="hover:opacity-80 transition-opacity"
               >
-                <img 
-                  src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png" 
+                <img
+                  src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
                   alt="ARTENO"
                   className="h-16 w-auto"
                 />
               </button>
             </div>
 
-            {/* Right Navigation */}
+            {/* Right Navigation - Desktop only */}
             <div className="hidden md:flex items-center space-x-6 flex-1 justify-end">
               <button
                 onClick={onSignOut}
@@ -1222,7 +1232,7 @@ const AboutPage: React.FC<AboutPageProps> = ({
               >
                 Sign Out
               </button>
-              <button 
+              <button
                 onClick={handleSearchToggle}
                 className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
               >
@@ -1231,15 +1241,8 @@ const AboutPage: React.FC<AboutPageProps> = ({
               </button>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-300 hover:text-white"
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
+            {/* Spacer for mobile to balance the layout */}
+            <div className="md:hidden order-3 w-6"></div>
           </div>
         </div>
 
@@ -1301,23 +1304,27 @@ const AboutPage: React.FC<AboutPageProps> = ({
 
                 <div className="space-y-3 lg:space-y-6 text-gray-300 text-sm md:text-base lg:text-lg leading-relaxed">
                   <p className="text-center lg:text-left">
-                    We're a new generation with a familiar foundation.
+                    At Arteno, we bring a new perspective to architectural materials. One that merges design, functionality, and emotion.
                   </p>
 
                   <p className="text-center lg:text-left">
-                    While our fathers built their businesses around tiles, sanitaryware, and construction materials, we grew up surrounded by textures, palettes, and spaces under transformation. That world shaped us — but we're here to reshape it.
+                    We see materials not simply as components of construction, but as instruments of expression capable of shaping light, texture, and atmosphere.
                   </p>
                   
                   <p className="text-center lg:text-left">
-                    ARTENO was born from the desire to do things differently.
-We don't offer just materials. We offer carefully selected, premium architectural elements that bring identity and emotion to a space.
+                    Our story begins with glass blocks, timeless architectural elements reimagined for contemporary spaces. Designed for projects of high specification and refined aesthetics, they embody precision, clarity, and enduring quality.
                   </p>
-                  
-                  <p className="text-center lg:text-left">
-                    We choose to work closely with a limited number of architectural studios — not out of exclusivity, but because we believe in collaboration. Together, we want to create projects that stand out for their originality and material soul.
 
-Every material we introduce carries a story.
-Let's build new ones — together.
+                  <p className="text-center lg:text-left">
+                    At Arteno, our vision is to redefine how materials participate in design: not as background elements, but as active forms that give identity to a space. We believe that true architecture lives in the dialogue between light and matter, where transparency becomes structure, and structure becomes art.
+                  </p>
+
+                  <p className="text-center lg:text-left">
+                    Guided by authenticity, innovation, and aesthetic integrity, we create materials that inspire timeless, thoughtful, and elevated projects.
+                  </p>
+                  
+                  <p className="text-center lg:text-left">
+                    Arteno stands for a design-driven philosophy, the art of building with intention.
                   </p>
                 </div>
 
@@ -1325,7 +1332,9 @@ Let's build new ones — together.
                 <div className="pt-4 lg:pt-8">
                   {/* Separator line */}
                   <div className="flex justify-center mb-6 lg:mb-8">
-                    <div className="w-[280px] md:w-[400px] h-0.5" style={{ backgroundColor: '#D7B387' }}></div>
+                    <div className="w-[280px] md:w-[400px] h-0.5 relative">
+                      <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent, #D7B387 10%, #D7B387 90%, transparent)' }} />
+                    </div>
                   </div>
                   
                   {/* Mobile: Stack everything vertically, Desktop: Side by side */}
@@ -1361,7 +1370,9 @@ Let's build new ones — together.
 
         {/* Extended Beige Separator Line Before Mission Section */}
         <div className="flex justify-center py-8 md:py-16 bg-black">
-          <div className="w-[280px] md:w-[800px] h-0.5" style={{ backgroundColor: '#D7B387' }}></div>
+          <div className="w-[280px] md:w-[800px] h-0.5 relative">
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent, #D7B387 10%, #D7B387 90%, transparent)' }} />
+          </div>
         </div>
 
         {/* Our Mission Section */}
@@ -1370,8 +1381,7 @@ Let's build new ones — together.
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">Our Mission</h2>
             <div className="space-y-6 text-xl text-gray-300 leading-relaxed">
               <p>
-                To provide rare, refined materials you won't find everywhere — 
-                for projects with character and a distinct architectural signature.
+                We aim to redefine architectural design materials, providing refined solutions that inspire and empower visionary projects.
               </p>
               <p>
                 We highlight the essence of each material as an architectural statement, 
@@ -1383,7 +1393,9 @@ Let's build new ones — together.
 
         {/* Extended Beige Separator Line Between Mission and Values */}
         <div className="flex justify-center py-16 bg-black">
-          <div className="w-[280px] md:w-[800px] h-0.5" style={{ backgroundColor: '#D7B387' }}></div>
+          <div className="w-[280px] md:w-[800px] h-0.5 relative">
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent, #D7B387 10%, #D7B387 90%, transparent)' }} />
+          </div>
         </div>
 
         {/* Values Section - Cards now in beige color */}
@@ -1394,32 +1406,29 @@ Let's build new ones — together.
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="rounded-2xl p-8" style={{ backgroundColor: '#D7B387' }}>
-                  <h3 className="text-2xl font-bold text-black mb-4">Uniqueness</h3>
-                  <p className="text-gray-800 leading-relaxed">
-                    We curate materials that aren't found everywhere, 
-                    ensuring your projects stand out with distinctive character.
+              <div className="text-center h-full">
+                <div className="rounded-2xl p-8 h-full flex flex-col" style={{ backgroundColor: '#D7B387', minHeight: '200px' }}>
+                  <h3 className="text-2xl font-bold text-black mb-4">Design</h3>
+                  <p className="text-gray-800 leading-relaxed flex-grow">
+                    We design with intention. Our goal is harmony: materials that shape space with quiet confidence.
                   </p>
                 </div>
               </div>
 
-              <div className="text-center">
-                <div className="rounded-2xl p-8" style={{ backgroundColor: '#D7B387' }}>
+              <div className="text-center h-full">
+                <div className="rounded-2xl p-8 h-full flex flex-col" style={{ backgroundColor: '#D7B387', minHeight: '200px' }}>
+                  <h3 className="text-2xl font-bold text-black mb-4">Innovation</h3>
+                  <p className="text-gray-800 leading-relaxed flex-grow">
+                    We challenge conventions and seek new possibilities in every form. Innovation for us means progress with purpose, design that evolves without losing its essence.
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-center h-full">
+                <div className="rounded-2xl p-8 h-full flex flex-col" style={{ backgroundColor: '#D7B387', minHeight: '200px' }}>
                   <h3 className="text-2xl font-bold text-black mb-4">Quality</h3>
-                  <p className="text-gray-800 leading-relaxed">
-                    Every material we offer meets the highest standards of 
-                    craftsmanship and durability for lasting architectural impact.
-                  </p>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="rounded-2xl p-8" style={{ backgroundColor: '#D7B387' }}>
-                  <h3 className="text-2xl font-bold text-black mb-4">Partnership</h3>
-                  <p className="text-gray-800 leading-relaxed">
-                    We work closely with architects, understanding their vision 
-                    and providing flexible solutions for every creative challenge.
+                  <p className="text-gray-800 leading-relaxed flex-grow">
+                    We value integrity over excess. Each material is chosen, crafted, and refined to meet the highest standards of performance and aesthetics, built to endure both physically and in time.
                   </p>
                 </div>
               </div>
@@ -1429,17 +1438,19 @@ Let's build new ones — together.
 
         {/* Extended Beige Separator Line Before Contact Section */}
         <div className="flex justify-center py-16 bg-black">
-          <div className="w-[280px] md:w-[800px] h-0.5" style={{ backgroundColor: '#D7B387' }}></div>
+          <div className="w-[280px] md:w-[800px] h-0.5 relative">
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, transparent, #D7B387 10%, #D7B387 90%, transparent)' }} />
+          </div>
         </div>
 
         {/* Contact CTA Section */}
         <div className="py-20 bg-black">
           <div className="max-w-4xl mx-auto text-center px-4">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Ready to Work Together?
+              Collaborate with Arteno.
             </h2>
             <p className="text-lg text-gray-300 mb-8">
-              Let's discuss how our unique materials can elevate your next architectural project.
+              Explore how our materials transform architecture into art.
             </p>
             <button 
               onClick={handleGetInTouchClick}

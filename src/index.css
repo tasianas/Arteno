@@ -13,7 +13,7 @@ html, body {
 }
 
 /* Ensure all elements respect viewport width */
-*:not(svg):not(path) {
+*:not(svg):not(path):not([class*="absolute"]) {
   max-width: 100%;
 }
 html {
