@@ -1,299 +1,326 @@
-import React, { useState } from "react";
-import { Search, Menu, X, User, LogOut, Settings } from "lucide-react";
+import React, { useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  Menu,
+  X,
+  ArrowRight,
+  UserCircle,
+  LogOut,
+  Settings,
+} from "lucide-react";
+import type { AuthUser } from "../lib/auth";
 
 interface HeaderProps {
-  currentPage: string;
-  setCurrentPage: (page: string) => void;
-  user: any;
-  onSignOut: () => void;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  handleSearch: () => void;
+  isLoggedIn: boolean;
+  user: AuthUser | null;
+  onLogoClick: () => void;
+  onProductsClick: (e?: React.MouseEvent) => void;
+  onInspirationsClick: (e?: React.MouseEvent) => void;
+  onAboutClick: (e?: React.MouseEvent) => void;
+  onAdminClick?: (e?: React.MouseEvent) => void;
+  onSettingsClick?: (e?: React.MouseEvent) => void;
+  onSearchToggle: () => void;
+  onLogout: () => void;
+  onSignInClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  currentPage,
-  setCurrentPage,
+  isLoggedIn,
   user,
-  onSignOut,
-  searchTerm,
-  setSearchTerm,
-  handleSearch,
+  onLogoClick,
+  onProductsClick,
+  onInspirationsClick,
+  onAboutClick,
+  onAdminClick,
+  onSettingsClick,
+  onSearchToggle,
+  onLogout,
+  onSignInClick,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    if (showProfileDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
-  };
 
-  return (
-    <nav
-      className="fixed top-0 w-full backdrop-blur-sm border-b z-40"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 md:justify-between">
-          {/* Mobile Menu Button - Left side on mobile */}
-          <div className="md:hidden order-1">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
-          {/* Logo - Centered on mobile, left on desktop */}
-          <button
-            onClick={() => setCurrentPage("home")}
-            className="hover:opacity-80 transition-opacity order-2 md:order-1 absolute left-1/2 transform -translate-x-1/2 md:relative md:left-0 md:transform-none"
-          >
-            <img
-              src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
-              alt="ARTENO"
-              className="h-16 w-auto"
-            />
-          </button>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => setCurrentPage("home")}
-              className={`text-lg font-medium transition-colors ${
-                currentPage === "home"
-                  ? "text-[#D7B387]"
-                  : "text-gray-300 hover:text-white"
-              }`}
-            >
-              Home
-            </button>
-            <button
-              onClick={() => setCurrentPage("products")}
-              className={`text-lg font-medium transition-colors ${
-                currentPage === "products"
-                  ? "text-[#D7B387]"
-                  : "text-gray-300 hover:text-white"
-              }`}
-            >
-              Products
-            </button>
-            <button
-              onClick={() => setCurrentPage("inspirations")}
-              className={`text-lg font-medium transition-colors ${
-                currentPage === "inspirations"
-                  ? "text-[#D7B387]"
-                  : "text-gray-300 hover:text-white"
-              }`}
-            >
-              Inspirations
-            </button>
-            <button
-              onClick={() => setCurrentPage("about")}
-              className={`text-lg font-medium transition-colors ${
-                currentPage === "about"
-                  ? "text-[#D7B387]"
-                  : "text-gray-300 hover:text-white"
-              }`}
-            >
-              About
-            </button>
-          </div>
-
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="w-64 px-4 py-2 pl-10 bg-gray-800 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387]"
-              />
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#D7B387] transition-colors"
-                size={18}
-                onClick={handleSearch}
-              />
-            </div>
-          </div>
-
-          {/* User Menu */}
-          <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
-                >
-                  <User size={20} />
-                  <span>{user.email}</span>
-                </button>
-
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2">
-                    {user?.type === "admin" && (
-                      <button
-                        onClick={() => {
-                          setCurrentPage("admin");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors flex items-center"
-                      >
-                        <Settings size={16} className="mr-2" />
-                        Admin Panel
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        onSignOut();
-                        setIsUserMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors flex items-center"
-                    >
-                      <LogOut size={16} className="mr-2" />
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
+  // Not logged in - Simple header
+  if (!isLoggedIn) {
+    return (
+      <nav
+        className="fixed top-0 w-full backdrop-blur-sm border-b z-50"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Center Logo */}
+            <div className="flex-1 flex justify-center">
               <button
-                onClick={() => setCurrentPage("login")}
-                className="bg-[#D7B387] text-black px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-colors"
+                onClick={onLogoClick}
+                className="hover:opacity-80 transition-opacity"
+              >
+                <img
+                  src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
+                  alt="ARTENO"
+                  className="h-16 w-auto"
+                />
+              </button>
+            </div>
+
+            {/* Sign In Button - Desktop */}
+            <div className="absolute right-4 hidden md:block">
+              <button
+                onClick={onSignInClick}
+                className="text-black px-6 py-2 rounded-lg hover:opacity-80 transition-colors font-semibold"
+                style={{ backgroundColor: "#D7B387" }}
               >
                 Sign In
               </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // Logged in - Full header with navigation
+  return (
+    <nav
+      className="fixed top-0 w-full backdrop-blur-sm border-b z-50"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative flex items-center h-20">
+          {/* Left Navigation */}
+          <div className="hidden md:flex items-center space-x-8 flex-1">
+            <Link
+              to="/products"
+              onClick={onProductsClick}
+              className="text-gray-300 hover:text-white transition-colors"
+            >
+              Products
+            </Link>
+            <Link
+              to="/inspirations"
+              onClick={onInspirationsClick}
+              className="text-gray-300 hover:text-white transition-colors"
+            >
+              Inspirations
+            </Link>
+            <Link
+              to="/about"
+              onClick={onAboutClick}
+              className="text-gray-300 hover:text-white transition-colors"
+            >
+              About
+            </Link>
+            {user?.type === "admin" && onAdminClick && (
+              <Link
+                to="/admin"
+                onClick={onAdminClick}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Admin
+              </Link>
             )}
           </div>
 
-          {/* Spacer for mobile to balance the layout */}
-          <div className="md:hidden order-3 w-6"></div>
-        </div>
+          {/* Center Logo - Absolutely positioned for true centering */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <button
+              onClick={onLogoClick}
+              className="hover:opacity-80 transition-opacity"
+            >
+              <img
+                src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
+                alt="ARTENO"
+                className="h-16 w-auto"
+              />
+            </button>
+          </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-700 py-4">
-            <div className="flex flex-col space-y-4">
-              {/* Mobile Search */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="w-full px-4 py-2 pl-10 bg-gray-800 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387]"
-                />
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#D7B387] transition-colors"
-                  size={18}
-                  onClick={handleSearch}
-                />
-              </div>
-
-              {/* Mobile Navigation Links */}
+          {/* Right Navigation */}
+          <div className="hidden md:flex items-center space-x-6 flex-1 justify-end">
+            {/* Profile Dropdown */}
+            <div className="relative" ref={profileDropdownRef}>
               <button
-                onClick={() => {
-                  setCurrentPage("home");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === "home"
-                    ? "text-[#D7B387]"
-                    : "text-gray-300 hover:text-white"
-                }`}
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
               >
-                Home
-              </button>
-              <button
-                onClick={() => {
-                  setCurrentPage("products");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === "products"
-                    ? "text-[#D7B387]"
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                Products
-              </button>
-              <button
-                onClick={() => {
-                  setCurrentPage("inspirations");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === "inspirations"
-                    ? "text-[#D7B387]"
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                Inspirations
-              </button>
-              <button
-                onClick={() => {
-                  setCurrentPage("about");
-                  setIsMenuOpen(false);
-                }}
-                className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === "about"
-                    ? "text-[#D7B387]"
-                    : "text-gray-300 hover:text-white"
-                }`}
-              >
-                About
+                <UserCircle className="h-6 w-6" />
               </button>
 
-              {/* Mobile User Menu */}
-              {user ? (
-                <div className="border-t border-gray-700 pt-4">
-                  <div className="flex items-center space-x-2 text-gray-300 mb-3">
-                    <User size={20} />
-                    <span>{user.email}</span>
+              {/* Dropdown Menu */}
+              {showProfileDropdown && (
+                <div
+                  className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                  style={{
+                    width: "256px",
+                    maxWidth: "256px",
+                    minWidth: "256px",
+                  }}
+                >
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <p className="text-sm font-semibold text-gray-900 truncate">
+                      {user?.email}
+                    </p>
+                    <p className="text-xs text-gray-500 capitalize">
+                      {user?.type} Account
+                    </p>
                   </div>
-                  {user?.type === "admin" && (
+                  <div className="py-1">
                     <button
                       onClick={() => {
-                        setCurrentPage("admin");
-                        setIsMenuOpen(false);
+                        setShowProfileDropdown(false);
+                        onSettingsClick?.();
                       }}
-                      className="w-full text-left text-gray-300 hover:text-white transition-colors flex items-center mb-2"
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                     >
-                      <Settings size={16} className="mr-2" />
-                      Admin Panel
+                      <Settings className="h-4 w-4" />
+                      Settings
                     </button>
-                  )}
-                  <button
-                    onClick={() => {
-                      onSignOut();
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full text-left text-gray-300 hover:text-white transition-colors flex items-center"
-                  >
-                    <LogOut size={16} className="mr-2" />
-                    Sign Out
-                  </button>
+                    <button
+                      onClick={() => {
+                        setShowProfileDropdown(false);
+                        onLogout();
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    setCurrentPage("login");
-                    setIsMenuOpen(false);
-                  }}
-                  className="bg-[#D7B387] text-black px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-colors"
-                >
-                  Sign In
-                </button>
               )}
             </div>
+
+            <button
+              onClick={onSearchToggle}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
+            >
+              <span>Search</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
-        )}
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-300 hover:text-white"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Mobile Navigation */}
+      {isMenuOpen && (
+        <div className="md:hidden border-t bg-black border-gray-800">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            {/* User Profile Section - Mobile */}
+            <div className="px-3 py-3 border-b border-gray-700 mb-2">
+              <div className="flex items-center space-x-3">
+                <div className="bg-[#D7B387] rounded-full p-2">
+                  <UserCircle className="h-6 w-6 text-black" />
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">
+                    {user?.email}
+                  </p>
+                  <p className="text-gray-400 text-xs capitalize">
+                    {user?.type} Account
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Link
+              to="/products"
+              onClick={onProductsClick}
+              className="block px-3 py-2 text-gray-300 hover:text-white"
+            >
+              Products
+            </Link>
+            <Link
+              to="/inspirations"
+              onClick={onInspirationsClick}
+              className="block px-3 py-2 text-gray-300 hover:text-white"
+            >
+              Inspirations
+            </Link>
+            <Link
+              to="/about"
+              onClick={onAboutClick}
+              className="block px-3 py-2 text-gray-300 hover:text-white"
+            >
+              About
+            </Link>
+            {user?.type === "admin" && onAdminClick && (
+              <Link
+                to="/admin"
+                onClick={onAdminClick}
+                className="block px-3 py-2 text-gray-300 hover:text-white"
+              >
+                Admin
+              </Link>
+            )}
+            <button
+              onClick={onSearchToggle}
+              className="block px-3 py-2 text-gray-300 hover:text-white w-full text-left"
+            >
+              Search →
+            </button>
+
+            {/* Divider */}
+            <div className="border-t border-gray-700 my-2"></div>
+
+            {/* Settings and Sign Out */}
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                onSettingsClick?.();
+              }}
+              className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white w-full text-left"
+            >
+              <Settings className="h-4 w-4" />
+              <span>Settings</span>
+            </button>
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                onLogout();
+              }}
+              className="flex items-center space-x-3 px-3 py-2 text-red-400 hover:text-red-300 w-full text-left"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

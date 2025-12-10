@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   ArrowLeft,
-  Menu,
-  X,
   Package,
   Truck,
   Shield,
@@ -12,7 +11,7 @@ import {
 import { supabase } from "../lib/supabase";
 
 interface ProductDetailProps {
-  productId: string;
+  productId?: string; // Optional now since we can get it from URL
   onBack: () => void;
   onLogoClick: () => void;
   onInspirationsClick: () => void;
@@ -32,23 +31,25 @@ interface Product {
 }
 
 const ProductDetailPage: React.FC<ProductDetailProps> = ({
-  productId,
+  productId: propProductId,
   onBack,
-  onLogoClick,
-  onInspirationsClick,
-  onAboutClick,
-  onSignOut,
 }) => {
+  const { productId: urlProductId } = useParams<{ productId: string }>();
+  const productId = propProductId || urlProductId;
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    fetchProduct();
+    if (productId) {
+      fetchProduct();
+    }
   }, [productId]);
 
   const fetchProduct = async () => {
+    if (!productId) return;
+
     try {
       const { data, error } = await supabase
         .from("products")
@@ -119,108 +120,6 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
 
   return (
     <div className="min-h-screen bg-black">
-      <nav
-        className="fixed top-0 w-full backdrop-blur-sm border-b z-40"
-        style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="hidden md:flex items-center space-x-8">
-              <a
-                href="#products"
-                onClick={onBack}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Products
-              </a>
-              <a
-                href="#applications"
-                onClick={onInspirationsClick}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Inspirations
-              </a>
-              <a
-                href="#about"
-                onClick={onAboutClick}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                About
-              </a>
-            </div>
-
-            <div className="flex items-center">
-              <button
-                onClick={onLogoClick}
-                className="hover:opacity-80 transition-opacity"
-              >
-                <img
-                  src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
-                  alt="ARTENO"
-                  className="h-16 w-auto"
-                />
-              </button>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-6">
-              <button
-                onClick={onSignOut}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
-
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-300 hover:text-white"
-              >
-                {isMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {isMenuOpen && (
-          <div className="md:hidden border-t bg-black border-gray-800">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <a
-                href="#products"
-                onClick={onBack}
-                className="block px-3 py-2 text-gray-300 hover:text-white"
-              >
-                Products
-              </a>
-              <a
-                href="#applications"
-                onClick={onInspirationsClick}
-                className="block px-3 py-2 text-gray-300 hover:text-white"
-              >
-                Inspirations
-              </a>
-              <a
-                href="#about"
-                onClick={onAboutClick}
-                className="block px-3 py-2 text-gray-300 hover:text-white"
-              >
-                About
-              </a>
-              <button
-                onClick={onSignOut}
-                className="block px-3 py-2 text-gray-300 hover:text-white w-full text-left"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
-
       <div className="pt-20">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <button

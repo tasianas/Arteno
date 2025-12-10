@@ -172,3 +172,66 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
     return null;
   }
 };
+
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      return { success: false, error: "Both passwords are required" };
+    }
+
+    if (newPassword.length < 6) {
+      return {
+        success: false,
+        error: "New password must be at least 6 characters",
+      };
+    }
+
+    if (currentPassword === newPassword) {
+      return {
+        success: false,
+        error: "New password must be different from current password",
+      };
+    }
+
+    // Get current user from session
+    const userStr = localStorage.getItem("arteno_user_session");
+    if (!userStr) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const session = JSON.parse(userStr);
+    const user = session.user;
+
+    // Verify current password
+    const { data: users, error: verifyError } = await supabase
+      .from("authorized_users")
+      .select("*")
+      .eq("email", user.email)
+      .eq("password", currentPassword)
+      .limit(1);
+
+    if (verifyError || !users || users.length === 0) {
+      return { success: false, error: "Current password is incorrect" };
+    }
+
+    // Update password
+    const { error: updateError } = await supabase
+      .from("authorized_users")
+      .update({ password: newPassword })
+      .eq("email", user.email);
+
+    if (updateError) {
+      console.error("Error updating password:", updateError);
+      return { success: false, error: "Failed to update password" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error changing password:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+};

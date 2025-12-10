@@ -37,6 +37,7 @@ interface Product {
   description: string;
   long_description: string | null;
   images: string | null;
+  bestseller?: boolean;
 }
 
 interface ContactMessage {
@@ -56,11 +57,7 @@ interface AdminPanelProps {
   onSignOut: () => void;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({
-  onBack,
-  onLogoClick,
-  onSignOut,
-}) => {
+const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [activeTab, setActiveTab] = useState<"users" | "products" | "messages">(
     "users"
   );
@@ -91,6 +88,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     description: "",
     long_description: "",
     images: [] as string[],
+    bestseller: false,
   });
   const [addingProduct, setAddingProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
@@ -102,8 +100,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     description: "",
     long_description: "",
     images: [] as string[],
+    bestseller: false,
   });
   const [updatingProduct, setUpdatingProduct] = useState(false);
+  const [productSearchQuery, setProductSearchQuery] = useState("");
+  const [productFilter, setProductFilter] = useState<"all" | "bestsellers">(
+    "all"
+  );
 
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
@@ -196,7 +199,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("authorized_users")
         .insert([
           {
@@ -268,7 +271,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("authorized_users")
         .update({
           email: editForm.email.trim(),
@@ -337,7 +340,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("products")
         .insert([
           {
@@ -352,6 +355,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               newProduct.images.length > 0
                 ? JSON.stringify(newProduct.images)
                 : null,
+            bestseller: newProduct.bestseller,
           },
         ])
         .select();
@@ -367,6 +371,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         description: "",
         long_description: "",
         images: [],
+        bestseller: false,
       });
       setShowAddProductForm(false);
       fetchProducts();
@@ -424,6 +429,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       description: product.description,
       long_description: product.long_description || "",
       images: parsedImages,
+      bestseller: product.bestseller || false,
     });
     setError("");
     setSuccess("");
@@ -447,7 +453,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("products")
         .update({
           code: editProductForm.code,
@@ -455,11 +461,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           category: editProductForm.category,
           image: editProductForm.image,
           description: editProductForm.description,
-          long_description: editProductForm.long_description || null,
+          long_description: editProductForm.long_description || "",
           images:
             editProductForm.images.length > 0
               ? JSON.stringify(editProductForm.images)
-              : null,
+              : "[]",
+          bestseller: editProductForm.bestseller,
         })
         .eq("id", productId)
         .select();
@@ -487,6 +494,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       description: "",
       long_description: "",
       images: [],
+      bestseller: false,
     });
     setError("");
   };
@@ -503,42 +511,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Navigation */}
-      <nav
-        className="fixed top-0 w-full backdrop-blur-sm border-b z-40"
-        style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <button
-              onClick={onBack}
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              ← Back
-            </button>
-
-            <button
-              onClick={onLogoClick}
-              className="hover:opacity-80 transition-opacity"
-            >
-              <img
-                src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
-                alt="ARTENO"
-                className="h-16 w-auto"
-              />
-            </button>
-
-            <button
-              onClick={onSignOut}
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </nav>
-
+    <div className="min-h-screen bg-black md:pl-60 md:pr-60">
       {/* Main Content */}
       <div className="pt-20 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -911,6 +884,43 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 </button>
               </div>
 
+              {/* Search and Filter Bar */}
+              <div className="mb-6 bg-gray-900 rounded-lg p-4 border border-gray-700">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="Search by code, name, or category..."
+                      value={productSearchQuery}
+                      onChange={(e) => setProductSearchQuery(e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387]"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setProductFilter("all")}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                        productFilter === "all"
+                          ? "bg-[#D7B387] text-black"
+                          : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                      }`}
+                    >
+                      All Products
+                    </button>
+                    <button
+                      onClick={() => setProductFilter("bestsellers")}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                        productFilter === "bestsellers"
+                          ? "bg-[#D7B387] text-black"
+                          : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                      }`}
+                    >
+                      Best Sellers
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Add Product Form */}
               {showAddProductForm && (
                 <div className="mb-8 bg-gray-900 rounded-lg p-6 border border-gray-700">
@@ -1046,6 +1056,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         }
                       />
                     </div>
+                    <div className="flex items-center space-x-2 p-4 bg-gray-800 rounded-lg border border-gray-600">
+                      <input
+                        type="checkbox"
+                        id="bestseller"
+                        checked={newProduct.bestseller}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            bestseller: e.target.checked,
+                          })
+                        }
+                        className="w-5 h-5 rounded border-gray-600 text-[#D7B387] focus:ring-2 focus:ring-[#D7B387] focus:ring-offset-0 bg-gray-700"
+                      />
+                      <label
+                        htmlFor="bestseller"
+                        className="text-sm text-gray-300 cursor-pointer"
+                      >
+                        Mark as Best Seller
+                      </label>
+                    </div>
                     <div className="flex space-x-4">
                       <button
                         type="submit"
@@ -1066,6 +1096,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             description: "",
                             long_description: "",
                             images: [],
+                            bestseller: false,
                           });
                           setError("");
                         }}
@@ -1082,7 +1113,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="bg-gray-900 rounded-lg border border-gray-700">
                 <div className="p-6 border-b border-gray-700">
                   <h3 className="text-xl font-semibold text-white">
-                    Products ({products.length})
+                    Products (
+                    {
+                      products.filter((product) => {
+                        const matchesSearch =
+                          productSearchQuery === "" ||
+                          product.code
+                            .toLowerCase()
+                            .includes(productSearchQuery.toLowerCase()) ||
+                          product.name
+                            .toLowerCase()
+                            .includes(productSearchQuery.toLowerCase()) ||
+                          product.category
+                            .toLowerCase()
+                            .includes(productSearchQuery.toLowerCase());
+                        const matchesFilter =
+                          productFilter === "all" ||
+                          (productFilter === "bestsellers" &&
+                            product.bestseller);
+                        return matchesSearch && matchesFilter;
+                      }).length
+                    }
+                    )
                   </h3>
                 </div>
 
@@ -1091,7 +1143,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#D7B387] mx-auto mb-4"></div>
                     <p className="text-gray-300">Loading products...</p>
                   </div>
-                ) : products.length === 0 ? (
+                ) : products.filter((product) => {
+                    const matchesSearch =
+                      productSearchQuery === "" ||
+                      product.code
+                        .toLowerCase()
+                        .includes(productSearchQuery.toLowerCase()) ||
+                      product.name
+                        .toLowerCase()
+                        .includes(productSearchQuery.toLowerCase()) ||
+                      product.category
+                        .toLowerCase()
+                        .includes(productSearchQuery.toLowerCase());
+                    const matchesFilter =
+                      productFilter === "all" ||
+                      (productFilter === "bestsellers" && product.bestseller);
+                    return matchesSearch && matchesFilter;
+                  }).length === 0 ? (
                   <div className="p-8 text-center">
                     <Package className="h-12 w-12 text-gray-600 mx-auto mb-4" />
                     <p className="text-gray-400">No products found</p>
@@ -1122,240 +1190,284 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-700">
-                        {products.map((product) => (
-                          <tr
-                            key={product.id}
-                            className={
-                              editingProduct === product.id
-                                ? "bg-gray-800/50"
-                                : "hover:bg-gray-800"
-                            }
-                          >
-                            {editingProduct === product.id ? (
-                              <>
-                                <td
-                                  className="px-6 py-6 whitespace-nowrap"
-                                  colSpan={6}
-                                >
-                                  <div className="bg-gray-800 rounded-lg p-6 border border-[#D7B387]/30">
-                                    <h4 className="text-white font-semibold mb-4 flex items-center">
-                                      <Edit2 className="h-4 w-4 mr-2 text-[#D7B387]" />
-                                      Edit Product
-                                    </h4>
-                                    <div className="space-y-4">
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {products
+                          .filter((product) => {
+                            const matchesSearch =
+                              productSearchQuery === "" ||
+                              product.code
+                                .toLowerCase()
+                                .includes(productSearchQuery.toLowerCase()) ||
+                              product.name
+                                .toLowerCase()
+                                .includes(productSearchQuery.toLowerCase()) ||
+                              product.category
+                                .toLowerCase()
+                                .includes(productSearchQuery.toLowerCase());
+                            const matchesFilter =
+                              productFilter === "all" ||
+                              (productFilter === "bestsellers" &&
+                                product.bestseller);
+                            return matchesSearch && matchesFilter;
+                          })
+                          .map((product) => (
+                            <tr
+                              key={product.id}
+                              className={
+                                editingProduct === product.id
+                                  ? "bg-gray-800/50"
+                                  : "hover:bg-gray-800"
+                              }
+                            >
+                              {editingProduct === product.id ? (
+                                <>
+                                  <td
+                                    className="px-6 py-6 whitespace-nowrap"
+                                    colSpan={6}
+                                  >
+                                    <div className="bg-gray-800 rounded-lg p-6 border border-[#D7B387]/30">
+                                      <h4 className="text-white font-semibold mb-4 flex items-center">
+                                        <Edit2 className="h-4 w-4 mr-2 text-[#D7B387]" />
+                                        Edit Product
+                                      </h4>
+                                      <div className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                          <div>
+                                            <label className="block text-xs text-gray-400 mb-2">
+                                              Product Code
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={editProductForm.code}
+                                              onChange={(e) =>
+                                                setEditProductForm({
+                                                  ...editProductForm,
+                                                  code: e.target.value,
+                                                })
+                                              }
+                                              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
+                                              placeholder="Product code"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-xs text-gray-400 mb-2">
+                                              Name
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={editProductForm.name}
+                                              onChange={(e) =>
+                                                setEditProductForm({
+                                                  ...editProductForm,
+                                                  name: e.target.value,
+                                                })
+                                              }
+                                              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
+                                              placeholder="Product name"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-xs text-gray-400 mb-2">
+                                              Category
+                                            </label>
+                                            <input
+                                              type="text"
+                                              value={editProductForm.category}
+                                              onChange={(e) =>
+                                                setEditProductForm({
+                                                  ...editProductForm,
+                                                  category: e.target.value,
+                                                })
+                                              }
+                                              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
+                                              placeholder="Category"
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-xs text-gray-400 mb-2">
+                                              Main Image
+                                            </label>
+                                            <SingleImageUpload
+                                              currentImage={
+                                                editProductForm.image
+                                              }
+                                              onImageChange={(imageUrl) =>
+                                                setEditProductForm({
+                                                  ...editProductForm,
+                                                  image: imageUrl,
+                                                })
+                                              }
+                                              label="Main Image"
+                                            />
+                                            <input
+                                              type="url"
+                                              value={editProductForm.image}
+                                              onChange={(e) =>
+                                                setEditProductForm({
+                                                  ...editProductForm,
+                                                  image: e.target.value,
+                                                })
+                                              }
+                                              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm mt-2"
+                                              placeholder="Or enter URL: https://..."
+                                            />
+                                          </div>
+                                        </div>
                                         <div>
                                           <label className="block text-xs text-gray-400 mb-2">
-                                            Product Code
+                                            Short Description
                                           </label>
-                                          <input
-                                            type="text"
-                                            value={editProductForm.code}
+                                          <textarea
+                                            value={editProductForm.description}
                                             onChange={(e) =>
                                               setEditProductForm({
                                                 ...editProductForm,
-                                                code: e.target.value,
+                                                description: e.target.value,
                                               })
                                             }
                                             className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
-                                            placeholder="Product code"
+                                            rows={2}
                                           />
                                         </div>
                                         <div>
                                           <label className="block text-xs text-gray-400 mb-2">
-                                            Name
+                                            Long Description
                                           </label>
-                                          <input
-                                            type="text"
-                                            value={editProductForm.name}
+                                          <textarea
+                                            value={
+                                              editProductForm.long_description
+                                            }
                                             onChange={(e) =>
                                               setEditProductForm({
                                                 ...editProductForm,
-                                                name: e.target.value,
+                                                long_description:
+                                                  e.target.value,
                                               })
                                             }
                                             className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
-                                            placeholder="Product name"
+                                            rows={3}
                                           />
                                         </div>
                                         <div>
                                           <label className="block text-xs text-gray-400 mb-2">
-                                            Category
+                                            Additional Images
                                           </label>
+                                          <ImageUpload
+                                            existingImages={
+                                              editProductForm.images
+                                            }
+                                            onImagesChange={(images) =>
+                                              setEditProductForm({
+                                                ...editProductForm,
+                                                images,
+                                              })
+                                            }
+                                          />
+                                        </div>
+                                        <div className="flex items-center space-x-2 p-3 bg-gray-900 rounded-lg border border-gray-600">
                                           <input
-                                            type="text"
-                                            value={editProductForm.category}
+                                            type="checkbox"
+                                            id="edit-bestseller"
+                                            checked={editProductForm.bestseller}
                                             onChange={(e) =>
                                               setEditProductForm({
                                                 ...editProductForm,
-                                                category: e.target.value,
+                                                bestseller: e.target.checked,
                                               })
                                             }
-                                            className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
-                                            placeholder="Category"
+                                            className="w-5 h-5 rounded border-gray-600 text-[#D7B387] focus:ring-2 focus:ring-[#D7B387] focus:ring-offset-0 bg-gray-700"
                                           />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs text-gray-400 mb-2">
-                                            Main Image
+                                          <label
+                                            htmlFor="edit-bestseller"
+                                            className="text-xs text-gray-300 cursor-pointer"
+                                          >
+                                            Mark as Best Seller
                                           </label>
-                                          <SingleImageUpload
-                                            currentImage={editProductForm.image}
-                                            onImageChange={(imageUrl) =>
-                                              setEditProductForm({
-                                                ...editProductForm,
-                                                image: imageUrl,
-                                              })
-                                            }
-                                            label="Main Image"
-                                          />
-                                          <input
-                                            type="url"
-                                            value={editProductForm.image}
-                                            onChange={(e) =>
-                                              setEditProductForm({
-                                                ...editProductForm,
-                                                image: e.target.value,
-                                              })
-                                            }
-                                            className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm mt-2"
-                                            placeholder="Or enter URL: https://..."
-                                          />
                                         </div>
                                       </div>
-                                      <div>
-                                        <label className="block text-xs text-gray-400 mb-2">
-                                          Short Description
-                                        </label>
-                                        <textarea
-                                          value={editProductForm.description}
-                                          onChange={(e) =>
-                                            setEditProductForm({
-                                              ...editProductForm,
-                                              description: e.target.value,
-                                            })
+                                      <div className="flex items-center space-x-3 mt-4">
+                                        <button
+                                          onClick={() =>
+                                            handleUpdateProduct(product.id)
                                           }
-                                          className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
-                                          rows={2}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-xs text-gray-400 mb-2">
-                                          Long Description
-                                        </label>
-                                        <textarea
-                                          value={
-                                            editProductForm.long_description
-                                          }
-                                          onChange={(e) =>
-                                            setEditProductForm({
-                                              ...editProductForm,
-                                              long_description: e.target.value,
-                                            })
-                                          }
-                                          className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] text-sm"
-                                          rows={3}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="block text-xs text-gray-400 mb-2">
-                                          Additional Images
-                                        </label>
-                                        <ImageUpload
-                                          existingImages={
-                                            editProductForm.images
-                                          }
-                                          onImagesChange={(images) =>
-                                            setEditProductForm({
-                                              ...editProductForm,
-                                              images,
-                                            })
-                                          }
-                                        />
+                                          disabled={updatingProduct}
+                                          className="bg-[#D7B387] text-black px-6 py-2 rounded-lg font-semibold hover:bg-[#c49f6c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                        >
+                                          <Save className="h-4 w-4 mr-2" />
+                                          {updatingProduct
+                                            ? "Saving..."
+                                            : "Save Changes"}
+                                        </button>
+                                        <button
+                                          onClick={handleCancelProductEdit}
+                                          className="bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center"
+                                        >
+                                          <X className="h-4 w-4 mr-2" />
+                                          Cancel
+                                        </button>
                                       </div>
                                     </div>
-                                    <div className="flex items-center space-x-3 mt-4">
+                                  </td>
+                                </>
+                              ) : (
+                                <>
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <img
+                                      src={product.image}
+                                      alt={product.name}
+                                      className="h-16 w-16 object-cover rounded-lg border border-gray-700"
+                                    />
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="text-[#D7B387] font-mono text-sm">
+                                      {product.code}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="text-white font-medium">
+                                      {product.name}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                      {product.category}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span className="text-gray-300 text-sm line-clamp-2">
+                                      {product.description}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center space-x-2">
                                       <button
                                         onClick={() =>
-                                          handleUpdateProduct(product.id)
+                                          handleEditProduct(product)
                                         }
-                                        disabled={updatingProduct}
-                                        className="bg-[#D7B387] text-black px-6 py-2 rounded-lg font-semibold hover:bg-[#c49f6c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                        className="bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg hover:bg-blue-500/30 transition-colors flex items-center text-sm font-medium"
+                                        title="Edit product"
                                       >
-                                        <Save className="h-4 w-4 mr-2" />
-                                        {updatingProduct
-                                          ? "Saving..."
-                                          : "Save Changes"}
+                                        <Edit2 className="h-3.5 w-3.5 mr-1.5" />
+                                        Edit
                                       </button>
                                       <button
-                                        onClick={handleCancelProductEdit}
-                                        className="bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center"
+                                        onClick={() =>
+                                          handleDeleteProduct(
+                                            product.id,
+                                            product.name
+                                          )
+                                        }
+                                        className="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-500/30 transition-colors flex items-center text-sm font-medium"
+                                        title="Delete product"
                                       >
-                                        <X className="h-4 w-4 mr-2" />
-                                        Cancel
+                                        <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                                        Delete
                                       </button>
                                     </div>
-                                  </div>
-                                </td>
-                              </>
-                            ) : (
-                              <>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className="h-16 w-16 object-cover rounded-lg border border-gray-700"
-                                  />
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <span className="text-[#D7B387] font-mono text-sm">
-                                    {product.code}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <span className="text-white font-medium">
-                                    {product.name}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                                    {product.category}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <span className="text-gray-300 text-sm line-clamp-2">
-                                    {product.description}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <div className="flex items-center space-x-2">
-                                    <button
-                                      onClick={() => handleEditProduct(product)}
-                                      className="bg-blue-500/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg hover:bg-blue-500/30 transition-colors flex items-center text-sm font-medium"
-                                      title="Edit product"
-                                    >
-                                      <Edit2 className="h-3.5 w-3.5 mr-1.5" />
-                                      Edit
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteProduct(
-                                          product.id,
-                                          product.name
-                                        )
-                                      }
-                                      className="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-500/30 transition-colors flex items-center text-sm font-medium"
-                                      title="Delete product"
-                                    >
-                                      <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                                      Delete
-                                    </button>
-                                  </div>
-                                </td>
-                              </>
-                            )}
-                          </tr>
-                        ))}
+                                  </td>
+                                </>
+                              )}
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>

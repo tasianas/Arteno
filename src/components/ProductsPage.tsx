@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Eye, Menu, X } from "lucide-react";
+import { Search, Filter, Eye } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 interface Product {
@@ -22,19 +22,11 @@ interface ProductsPageProps {
   onProductClick: (productId: string) => void;
 }
 
-const ProductsPage: React.FC<ProductsPageProps> = ({
-  onBack,
-  onLogoClick,
-  onInspirationsClick,
-  onAboutClick,
-  onSignOut,
-  onProductClick,
-}) => {
+const ProductsPage: React.FC<ProductsPageProps> = ({ onProductClick }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searching, setSearching] = useState(false);
 
   const categories = [
@@ -126,244 +118,134 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Navigation Header */}
-      <nav
-        className="fixed top-0 w-full backdrop-blur-sm border-b z-40"
-        style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center h-20">
-            {/* Left Navigation */}
-            <div className="hidden md:flex items-center space-x-8 flex-1">
-              <a
-                href="#products"
-                onClick={onBack}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Products
-              </a>
-              <a
-                href="#applications"
-                onClick={onInspirationsClick}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Inspirations
-              </a>
-              <a
-                href="#about"
-                onClick={onAboutClick}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                About
-              </a>
-            </div>
-
-            {/* Center Logo - Clickable - Absolutely positioned for true centering */}
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <button
-                onClick={onLogoClick}
-                className="hover:opacity-80 transition-opacity"
-              >
-                <img
-                  src="https://rteznkwgofrhunwtwamk.supabase.co/storage/v1/object/public/media/2880726A-8DC4-4EA4-9E98-4D57812AD32E2%20(1).png"
-                  alt="ARTENO"
-                  className="h-16 w-auto"
-                />
-              </button>
-            </div>
-
-            {/* Right Navigation */}
-            <div className="hidden md:flex items-center space-x-6 flex-1 justify-end">
-              <button
-                onClick={onSignOut}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Sign Out
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-300 hover:text-white"
-              >
-                {isMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t bg-black border-gray-800">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <a
-                href="#products"
-                onClick={onBack}
-                className="block px-3 py-2 text-gray-300 hover:text-white"
-              >
-                Products
-              </a>
-              <a
-                href="#applications"
-                onClick={onInspirationsClick}
-                className="block px-3 py-2 text-gray-300 hover:text-white"
-              >
-                Inspirations
-              </a>
-              <a
-                href="#about"
-                onClick={onAboutClick}
-                className="block px-3 py-2 text-gray-300 hover:text-white"
-              >
-                About
-              </a>
-              <button
-                onClick={onSignOut}
-                className="block px-3 py-2 text-gray-300 hover:text-white w-full text-left"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
-
       {/* Page Content - with top padding for fixed nav */}
-      <div className="pt-20">
+      <div className="pt-20 md:pl-80 md:pr-80 ">
         {/* Header */}
-        <div className="bg-black border-b border-gray-800">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <h1 className="text-4xl font-bold text-white mb-4">Our Products</h1>
-            <p className="text-xl text-gray-300">
+        <div className="bg-black pt-8 pb-12">
+          <div className="max-w-7xl mx-auto px-4">
+            <h1 className="text-5xl md:text-6xl font-light text-white mb-3">
+              Our Products
+            </h1>
+            <p className="text-lg text-gray-400 font-light">
               Discover our complete collection of premium glass blocks
             </p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="bg-gray-900 rounded-lg shadow-sm p-6 mb-8 border border-gray-800">
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Search */}
-              <div className="flex-1">
-                <div className="relative">
-                  <Search
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={20}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387]"
-                  />
-                </div>
-              </div>
-
-              {/* Category Filter */}
-              <div className="lg:w-64">
-                <div className="relative">
-                  <Filter
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={20}
-                  />
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] appearance-none"
-                  >
-                    {categories.map((category) => (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+        <div className="max-w-7xl mx-auto px-4 pb-8">
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+            {/* Search */}
+            <div className="w-full sm:w-auto sm:flex-1 sm:max-w-md">
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  size={18}
+                />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-transparent border border-gray-800 text-white text-sm rounded-md focus:outline-none focus:border-gray-700 placeholder:text-gray-600"
+                />
               </div>
             </div>
-          </div>
 
-          {/* Results Count */}
-          <div className="mb-6">
-            <p className="text-gray-300">
-              Showing {products.length} product
-              {products.length !== 1 ? "s" : ""}
-            </p>
-          </div>
-
-          {/* Products Grid */}
-          {searching && (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D7B387] mx-auto mb-4"></div>
-              <p className="text-gray-300">Searching...</p>
-            </div>
-          )}
-          {!searching && products.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
-                <Search size={48} className="mx-auto" />
+            {/* Category Filter & Count */}
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-initial sm:w-48">
+                <Filter
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  size={18}
+                />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-transparent border border-gray-800 text-white text-sm rounded-md focus:outline-none focus:border-gray-700 appearance-none cursor-pointer"
+                >
+                  {categories.map((category) => (
+                    <option
+                      key={category.value}
+                      value={category.value}
+                      className="bg-black"
+                    >
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                No products found
-              </h3>
-              <p className="text-gray-300">
-                Try adjusting your search or filter criteria
+
+              <p className="text-gray-500 text-sm whitespace-nowrap">
+                {products.length}{" "}
+                {products.length !== 1 ? "products" : "product"}
               </p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => onProductClick(product.id)}
-                  className="bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-800 cursor-pointer hover:border-[#D7B387]"
-                >
-                  <div className="relative">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-64 object-cover rounded-t-lg"
-                    />
-                  </div>
+          </div>
+        </div>
 
-                  <div className="p-6">
-                    {product.code && (
-                      <p className="text-[#D7B387] text-xs font-semibold mb-2">
-                        {product.code}
-                      </p>
-                    )}
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">
-                      {product.description}
+        {/* Products Grid */}
+        {searching && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D7B387] mx-auto mb-4"></div>
+            <p className="text-gray-300">Searching...</p>
+          </div>
+        )}
+        {!searching && products.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <Search size={48} className="mx-auto" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              No products found
+            </h3>
+            <p className="text-gray-300">
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                onClick={() => onProductClick(product.id)}
+                className="group bg-black border border-gray-900 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 hover:border-gray-700"
+              >
+                <div className="relative overflow-hidden bg-gray-950">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+
+                <div className="p-5">
+                  {product.code && (
+                    <p className="text-[#D7B387] text-xs font-medium mb-2 tracking-wide">
+                      {product.code}
                     </p>
+                  )}
+                  <h3 className="text-base font-medium text-white mb-2 group-hover:text-gray-200 transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-500 text-sm mb-3 line-clamp-2">
+                    {product.description}
+                  </p>
 
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-gray-400">
-                        {product.category}
-                      </span>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors bg-[#D7B387] hover:bg-[#c49f6c] text-black">
-                        <Eye size={16} className="inline mr-2" />
-                        View Details
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-900">
+                    <span className="text-xs text-gray-600">
+                      {product.category}
+                    </span>
+                    <button className="text-[#D7B387] text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                      View Details
+                      <Eye size={14} />
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
