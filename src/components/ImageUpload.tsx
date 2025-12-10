@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
-import { Upload, X, Loader } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import React, { useState } from "react";
+import { Upload, X, Loader } from "lucide-react";
+import { supabase } from "../lib/supabase";
 
 interface ImageUploadProps {
   existingImages: string[];
   onImagesChange: (images: string[]) => void;
 }
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({ existingImages, onImagesChange }) => {
+export const ImageUpload: React.FC<ImageUploadProps> = ({
+  existingImages,
+  onImagesChange,
+}) => {
   const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState('');
+  const [uploadError, setUploadError] = useState("");
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     setUploading(true);
-    setUploadError('');
+    setUploadError("");
 
     try {
       const uploadPromises = Array.from(files).map(async (file) => {
-        if (!file.type.startsWith('image/')) {
+        if (!file.type.startsWith("image/")) {
           throw new Error(`${file.name} is not an image file`);
         }
 
@@ -28,19 +31,21 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ existingImages, onImag
           throw new Error(`${file.name} is larger than 5MB`);
         }
 
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random()
+          .toString(36)
+          .substring(2)}.${fileExt}`;
         const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('product-images')
+          .from("product-images")
           .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(filePath);
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("product-images").getPublicUrl(filePath);
 
         return publicUrl;
       });
@@ -48,25 +53,23 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ existingImages, onImag
       const newUrls = await Promise.all(uploadPromises);
       onImagesChange([...existingImages, ...newUrls]);
     } catch (error: any) {
-      console.error('Error uploading images:', error);
-      setUploadError(error.message || 'Failed to upload images');
+      console.error("Error uploading images:", error);
+      setUploadError(error.message || "Failed to upload images");
     } finally {
       setUploading(false);
-      e.target.value = '';
+      e.target.value = "";
     }
   };
 
   const handleRemoveImage = async (urlToRemove: string) => {
     try {
-      const fileName = urlToRemove.split('/').pop();
+      const fileName = urlToRemove.split("/").pop();
       if (fileName) {
-        await supabase.storage
-          .from('product-images')
-          .remove([fileName]);
+        await supabase.storage.from("product-images").remove([fileName]);
       }
-      onImagesChange(existingImages.filter(url => url !== urlToRemove));
+      onImagesChange(existingImages.filter((url) => url !== urlToRemove));
     } catch (error) {
-      console.error('Error removing image:', error);
+      console.error("Error removing image:", error);
     }
   };
 
@@ -75,7 +78,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ existingImages, onImag
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 px-4 py-2 bg-[#D7B387] text-black rounded-lg font-semibold hover:opacity-90 transition-colors cursor-pointer">
           <Upload className="h-4 w-4" />
-          {uploading ? 'Uploading...' : 'Upload Images'}
+          {uploading ? "Uploading..." : "Upload Images"}
           <input
             type="file"
             accept="image/*"
@@ -85,7 +88,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ existingImages, onImag
             className="hidden"
           />
         </label>
-        {uploading && <Loader className="h-5 w-5 animate-spin text-[#D7B387]" />}
+        {uploading && (
+          <Loader className="h-5 w-5 animate-spin text-[#D7B387]" />
+        )}
       </div>
 
       {uploadError && (

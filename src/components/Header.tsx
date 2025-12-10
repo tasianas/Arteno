@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Menu, X, User, LogOut, Settings } from 'lucide-react';
+import React, { useState } from "react";
+import { Search, Menu, X, User, LogOut, Settings } from "lucide-react";
 
 interface HeaderProps {
   currentPage: string;
@@ -18,19 +18,22 @@ const Header: React.FC<HeaderProps> = ({
   onSignOut,
   searchTerm,
   setSearchTerm,
-  handleSearch
+  handleSearch,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearch();
     }
   };
 
   return (
-    <nav className="fixed top-0 w-full backdrop-blur-sm border-b z-40" style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', borderColor: '#333' }}>
+    <nav
+      className="fixed top-0 w-full backdrop-blur-sm border-b z-40"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20 md:justify-between">
           {/* Mobile Menu Button - Left side on mobile */}
@@ -45,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Logo - Centered on mobile, left on desktop */}
           <button
-            onClick={() => setCurrentPage('home')}
+            onClick={() => setCurrentPage("home")}
             className="hover:opacity-80 transition-opacity order-2 md:order-1 absolute left-1/2 transform -translate-x-1/2 md:relative md:left-0 md:transform-none"
           >
             <img
@@ -58,33 +61,41 @@ const Header: React.FC<HeaderProps> = ({
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <button
-              onClick={() => setCurrentPage('home')}
+              onClick={() => setCurrentPage("home")}
               className={`text-lg font-medium transition-colors ${
-                currentPage === 'home' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                currentPage === "home"
+                  ? "text-[#D7B387]"
+                  : "text-gray-300 hover:text-white"
               }`}
             >
               Home
             </button>
             <button
-              onClick={() => setCurrentPage('products')}
+              onClick={() => setCurrentPage("products")}
               className={`text-lg font-medium transition-colors ${
-                currentPage === 'products' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                currentPage === "products"
+                  ? "text-[#D7B387]"
+                  : "text-gray-300 hover:text-white"
               }`}
             >
               Products
             </button>
             <button
-              onClick={() => setCurrentPage('inspirations')}
+              onClick={() => setCurrentPage("inspirations")}
               className={`text-lg font-medium transition-colors ${
-                currentPage === 'inspirations' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                currentPage === "inspirations"
+                  ? "text-[#D7B387]"
+                  : "text-gray-300 hover:text-white"
               }`}
             >
               Inspirations
             </button>
             <button
-              onClick={() => setCurrentPage('about')}
+              onClick={() => setCurrentPage("about")}
               className={`text-lg font-medium transition-colors ${
-                currentPage === 'about' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                currentPage === "about"
+                  ? "text-[#D7B387]"
+                  : "text-gray-300 hover:text-white"
               }`}
             >
               About
@@ -102,8 +113,8 @@ const Header: React.FC<HeaderProps> = ({
                 onKeyPress={handleKeyPress}
                 className="w-64 px-4 py-2 pl-10 bg-gray-800 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387]"
               />
-              <Search 
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#D7B387] transition-colors" 
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#D7B387] transition-colors"
                 size={18}
                 onClick={handleSearch}
               />
@@ -121,13 +132,13 @@ const Header: React.FC<HeaderProps> = ({
                   <User size={20} />
                   <span>{user.email}</span>
                 </button>
-                
+
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2">
-                    {user?.type === 'admin' && (
+                    {user?.type === "admin" && (
                       <button
                         onClick={() => {
-                          setCurrentPage('admin');
+                          setCurrentPage("admin");
                           setIsUserMenuOpen(false);
                         }}
                         className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors flex items-center"
@@ -151,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             ) : (
               <button
-                onClick={() => setCurrentPage('login')}
+                onClick={() => setCurrentPage("login")}
                 className="bg-[#D7B387] text-black px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-colors"
               >
                 Sign In
@@ -177,8 +188,8 @@ const Header: React.FC<HeaderProps> = ({
                   onKeyPress={handleKeyPress}
                   className="w-full px-4 py-2 pl-10 bg-gray-800 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387]"
                 />
-                <Search 
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#D7B387] transition-colors" 
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-[#D7B387] transition-colors"
                   size={18}
                   onClick={handleSearch}
                 />
@@ -187,44 +198,52 @@ const Header: React.FC<HeaderProps> = ({
               {/* Mobile Navigation Links */}
               <button
                 onClick={() => {
-                  setCurrentPage('home');
+                  setCurrentPage("home");
                   setIsMenuOpen(false);
                 }}
                 className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === 'home' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                  currentPage === "home"
+                    ? "text-[#D7B387]"
+                    : "text-gray-300 hover:text-white"
                 }`}
               >
                 Home
               </button>
               <button
                 onClick={() => {
-                  setCurrentPage('products');
+                  setCurrentPage("products");
                   setIsMenuOpen(false);
                 }}
                 className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === 'products' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                  currentPage === "products"
+                    ? "text-[#D7B387]"
+                    : "text-gray-300 hover:text-white"
                 }`}
               >
                 Products
               </button>
               <button
                 onClick={() => {
-                  setCurrentPage('inspirations');
+                  setCurrentPage("inspirations");
                   setIsMenuOpen(false);
                 }}
                 className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === 'inspirations' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                  currentPage === "inspirations"
+                    ? "text-[#D7B387]"
+                    : "text-gray-300 hover:text-white"
                 }`}
               >
                 Inspirations
               </button>
               <button
                 onClick={() => {
-                  setCurrentPage('about');
+                  setCurrentPage("about");
                   setIsMenuOpen(false);
                 }}
                 className={`text-left text-lg font-medium transition-colors ${
-                  currentPage === 'about' ? 'text-[#D7B387]' : 'text-gray-300 hover:text-white'
+                  currentPage === "about"
+                    ? "text-[#D7B387]"
+                    : "text-gray-300 hover:text-white"
                 }`}
               >
                 About
@@ -237,10 +256,10 @@ const Header: React.FC<HeaderProps> = ({
                     <User size={20} />
                     <span>{user.email}</span>
                   </div>
-                  {user?.type === 'admin' && (
+                  {user?.type === "admin" && (
                     <button
                       onClick={() => {
-                        setCurrentPage('admin');
+                        setCurrentPage("admin");
                         setIsMenuOpen(false);
                       }}
                       className="w-full text-left text-gray-300 hover:text-white transition-colors flex items-center mb-2"
@@ -263,7 +282,7 @@ const Header: React.FC<HeaderProps> = ({
               ) : (
                 <button
                   onClick={() => {
-                    setCurrentPage('login');
+                    setCurrentPage("login");
                     setIsMenuOpen(false);
                   }}
                   className="bg-[#D7B387] text-black px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-colors"

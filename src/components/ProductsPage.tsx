@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, ShoppingCart, Star, Eye, Menu, X, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import React, { useState, useEffect } from "react";
+import { Search, Filter, Eye, Menu, X } from "lucide-react";
+import { supabase } from "../lib/supabase";
 
 interface Product {
   id: string;
@@ -31,16 +31,16 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   onProductClick,
 }) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searching, setSearching] = useState(false);
 
   const categories = [
-    { value: 'all', label: 'All Products' },
-    { value: 'Clear Series', label: 'Clear Series' },
-    { value: 'Color Series', label: 'Color Series' }
+    { value: "all", label: "All Products" },
+    { value: "Clear Series", label: "Clear Series" },
+    { value: "Color Series", label: "Color Series" },
   ];
 
   useEffect(() => {
@@ -50,16 +50,16 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   const fetchProducts = async () => {
     try {
       setSearching(true);
-      let query = supabase
-        .from('products')
-        .select('*');
+      let query = supabase.from("products").select("*");
 
-      if (selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
+      if (selectedCategory !== "all") {
+        query = query.eq("category", selectedCategory);
       }
 
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,code.ilike.%${searchTerm}%`);
+        query = query.or(
+          `name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,code.ilike.%${searchTerm}%`
+        );
       }
 
       const { data, error } = await query;
@@ -67,7 +67,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
       if (error) throw error;
 
       // Custom sorting: by series (B, A, C, D, E, F, G) then by numeric code
-      const seriesOrder = ['B', 'A', 'C', 'D', 'E', 'F', 'G'];
+      const seriesOrder = ["B", "A", "C", "D", "E", "F", "G"];
       const sortedData = (data || []).sort((a, b) => {
         // Extract series letter and number from code (e.g., GRLX-A101 -> series: A, num: 101)
         const getSeriesAndNum = (code: string) => {
@@ -78,9 +78,12 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
           // Fallback for codes without GRLX- prefix
           const simpleMatch = code.match(/^([A-Z])(\d+)$/);
           if (simpleMatch) {
-            return { series: simpleMatch[1], num: parseInt(simpleMatch[2], 10) };
+            return {
+              series: simpleMatch[1],
+              num: parseInt(simpleMatch[2], 10),
+            };
           }
-          return { series: '', num: 999999 };
+          return { series: "", num: 999999 };
         };
 
         const aData = getSeriesAndNum(a.code);
@@ -103,7 +106,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
       setProducts(sortedData);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
       setSearching(false);
@@ -124,14 +127,35 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   return (
     <div className="min-h-screen bg-black">
       {/* Navigation Header */}
-      <nav className="fixed top-0 w-full backdrop-blur-sm border-b z-40" style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', borderColor: '#333' }}>
+      <nav
+        className="fixed top-0 w-full backdrop-blur-sm border-b z-40"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center h-20">
             {/* Left Navigation */}
             <div className="hidden md:flex items-center space-x-8 flex-1">
-              <a href="#products" onClick={onBack} className="text-gray-300 hover:text-white transition-colors">Products</a>
-              <a href="#applications" onClick={onInspirationsClick} className="text-gray-300 hover:text-white transition-colors">Inspirations</a>
-              <a href="#about" onClick={onAboutClick} className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a
+                href="#products"
+                onClick={onBack}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Products
+              </a>
+              <a
+                href="#applications"
+                onClick={onInspirationsClick}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Inspirations
+              </a>
+              <a
+                href="#about"
+                onClick={onAboutClick}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                About
+              </a>
             </div>
 
             {/* Center Logo - Clickable - Absolutely positioned for true centering */}
@@ -164,7 +188,11 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-gray-300 hover:text-white"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
@@ -174,9 +202,27 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
         {isMenuOpen && (
           <div className="md:hidden border-t bg-black border-gray-800">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#products" onClick={onBack} className="block px-3 py-2 text-gray-300 hover:text-white">Products</a>
-              <a href="#applications" onClick={onInspirationsClick} className="block px-3 py-2 text-gray-300 hover:text-white">Inspirations</a>
-              <a href="#about" onClick={onAboutClick} className="block px-3 py-2 text-gray-300 hover:text-white">About</a>
+              <a
+                href="#products"
+                onClick={onBack}
+                className="block px-3 py-2 text-gray-300 hover:text-white"
+              >
+                Products
+              </a>
+              <a
+                href="#applications"
+                onClick={onInspirationsClick}
+                className="block px-3 py-2 text-gray-300 hover:text-white"
+              >
+                Inspirations
+              </a>
+              <a
+                href="#about"
+                onClick={onAboutClick}
+                className="block px-3 py-2 text-gray-300 hover:text-white"
+              >
+                About
+              </a>
               <button
                 onClick={onSignOut}
                 className="block px-3 py-2 text-gray-300 hover:text-white w-full text-left"
@@ -207,7 +253,10 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
               {/* Search */}
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
                   <input
                     type="text"
                     placeholder="Search products..."
@@ -221,13 +270,16 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
               {/* Category Filter */}
               <div className="lg:w-64">
                 <div className="relative">
-                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Filter
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-[#D7B387] focus:border-[#D7B387] appearance-none"
                   >
-                    {categories.map(category => (
+                    {categories.map((category) => (
                       <option key={category.value} value={category.value}>
                         {category.label}
                       </option>
@@ -241,7 +293,8 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
           {/* Results Count */}
           <div className="mb-6">
             <p className="text-gray-300">
-              Showing {products.length} product{products.length !== 1 ? 's' : ''}
+              Showing {products.length} product
+              {products.length !== 1 ? "s" : ""}
             </p>
           </div>
 
@@ -257,8 +310,12 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
               <div className="text-gray-400 mb-4">
                 <Search size={48} className="mx-auto" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">No products found</h3>
-              <p className="text-gray-300">Try adjusting your search or filter criteria</p>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                No products found
+              </h3>
+              <p className="text-gray-300">
+                Try adjusting your search or filter criteria
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -278,10 +335,16 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
                   <div className="p-6">
                     {product.code && (
-                      <p className="text-[#D7B387] text-xs font-semibold mb-2">{product.code}</p>
+                      <p className="text-[#D7B387] text-xs font-semibold mb-2">
+                        {product.code}
+                      </p>
                     )}
-                    <h3 className="text-lg font-semibold text-white mb-2">{product.name}</h3>
-                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">{product.description}</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+                      {product.description}
+                    </p>
 
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-sm text-gray-400">
@@ -290,9 +353,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
                     </div>
 
                     <div className="flex gap-2">
-                      <button
-                        className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors bg-[#D7B387] hover:bg-[#c49f6c] text-black"
-                      >
+                      <button className="flex-1 py-2 px-4 rounded-lg font-semibold transition-colors bg-[#D7B387] hover:bg-[#c49f6c] text-black">
                         <Eye size={16} className="inline mr-2" />
                         View Details
                       </button>

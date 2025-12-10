@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ShoppingCart, Star, Menu, X, Package, Truck, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import React, { useState, useEffect } from "react";
+import {
+  ArrowLeft,
+  Menu,
+  X,
+  Package,
+  Truck,
+  Shield,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { supabase } from "../lib/supabase";
 
 interface ProductDetailProps {
   productId: string;
@@ -42,15 +51,15 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
   const fetchProduct = async () => {
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
+        .from("products")
+        .select("*")
+        .eq("id", productId)
         .maybeSingle();
 
       if (error) throw error;
       setProduct(data);
     } catch (error) {
-      console.error('Error fetching product:', error);
+      console.error("Error fetching product:", error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +83,9 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + allImages.length) % allImages.length
+    );
   };
 
   if (loading) {
@@ -92,7 +103,9 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Product not found</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Product not found
+          </h2>
           <button
             onClick={onBack}
             className="bg-[#D7B387] text-black px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-colors"
@@ -106,13 +119,34 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
 
   return (
     <div className="min-h-screen bg-black">
-      <nav className="fixed top-0 w-full backdrop-blur-sm border-b z-40" style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', borderColor: '#333' }}>
+      <nav
+        className="fixed top-0 w-full backdrop-blur-sm border-b z-40"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.9)", borderColor: "#333" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#products" onClick={onBack} className="text-gray-300 hover:text-white transition-colors">Products</a>
-              <a href="#applications" onClick={onInspirationsClick} className="text-gray-300 hover:text-white transition-colors">Inspirations</a>
-              <a href="#about" onClick={onAboutClick} className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a
+                href="#products"
+                onClick={onBack}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Products
+              </a>
+              <a
+                href="#applications"
+                onClick={onInspirationsClick}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Inspirations
+              </a>
+              <a
+                href="#about"
+                onClick={onAboutClick}
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                About
+              </a>
             </div>
 
             <div className="flex items-center">
@@ -142,7 +176,11 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-gray-300 hover:text-white"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
@@ -151,9 +189,27 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
         {isMenuOpen && (
           <div className="md:hidden border-t bg-black border-gray-800">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#products" onClick={onBack} className="block px-3 py-2 text-gray-300 hover:text-white">Products</a>
-              <a href="#applications" onClick={onInspirationsClick} className="block px-3 py-2 text-gray-300 hover:text-white">Inspirations</a>
-              <a href="#about" onClick={onAboutClick} className="block px-3 py-2 text-gray-300 hover:text-white">About</a>
+              <a
+                href="#products"
+                onClick={onBack}
+                className="block px-3 py-2 text-gray-300 hover:text-white"
+              >
+                Products
+              </a>
+              <a
+                href="#applications"
+                onClick={onInspirationsClick}
+                className="block px-3 py-2 text-gray-300 hover:text-white"
+              >
+                Inspirations
+              </a>
+              <a
+                href="#about"
+                onClick={onAboutClick}
+                className="block px-3 py-2 text-gray-300 hover:text-white"
+              >
+                About
+              </a>
               <button
                 onClick={onSignOut}
                 className="block px-3 py-2 text-gray-300 hover:text-white w-full text-left"
@@ -209,8 +265,8 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
                       onClick={() => setCurrentImageIndex(index)}
                       className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
                         currentImageIndex === index
-                          ? 'border-[#D7B387]'
-                          : 'border-gray-700 hover:border-gray-600'
+                          ? "border-[#D7B387]"
+                          : "border-gray-700 hover:border-gray-600"
                       }`}
                     >
                       <img
@@ -227,18 +283,28 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
             <div className="space-y-6">
               <div>
                 {product.code && (
-                  <p className="text-[#D7B387] text-sm font-semibold mb-2">{product.code}</p>
+                  <p className="text-[#D7B387] text-sm font-semibold mb-2">
+                    {product.code}
+                  </p>
                 )}
-                <h1 className="text-4xl font-bold text-white mb-4">{product.name}</h1>
+                <h1 className="text-4xl font-bold text-white mb-4">
+                  {product.name}
+                </h1>
                 <div className="mb-4">
-                  <span className="text-sm text-gray-400">Category: {product.category}</span>
+                  <span className="text-sm text-gray-400">
+                    Category: {product.category}
+                  </span>
                 </div>
-                <p className="text-gray-300 text-lg leading-relaxed">{product.description}</p>
+                <p className="text-gray-300 text-lg leading-relaxed">
+                  {product.description}
+                </p>
               </div>
 
               {product.long_description && (
                 <div className="border-t border-gray-800 pt-6">
-                  <h3 className="text-xl font-semibold text-white mb-3">Details</h3>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    Details
+                  </h3>
                   <p className="text-gray-300 leading-relaxed whitespace-pre-line">
                     {product.long_description}
                   </p>
@@ -246,7 +312,9 @@ const ProductDetailPage: React.FC<ProductDetailProps> = ({
               )}
 
               <div className="border-t border-gray-800 pt-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Product Information</h3>
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  Product Information
+                </h3>
                 <div className="space-y-3">
                   <div className="flex items-center text-gray-300">
                     <Package className="h-5 w-5 mr-3 text-[#D7B387]" />
